@@ -1,0 +1,60 @@
+package restisbest;
+
+import org.testng.annotations.Test;
+
+import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
+
+import static io.restassured.RestAssured.*;
+import io.restassured.response.Response;
+
+public class Trello {
+	String id;
+	String key="f1c1a91e473615e9441bb4bc75ab0b3c";
+	String token="ATTA4ebd9a93f5f32dcfae4dc25e636dbf7e3a48f005b7ed05131eb536c0590778bb8ACF8A6D";
+	
+	@Test
+	public void create_Board() {
+		RestAssured.baseURI="https://api.trello.com";
+		Response Re=  given().queryParam("name", "{avi}")
+				.queryParam("key", "f1c1a91e473615e9441bb4bc75ab0b3c")
+				.queryParam("token", "ATTA4ebd9a93f5f32dcfae4dc25e636dbf7e3a48f005b7ed05131eb536c0590778bb8ACF8A6D")
+				.header("Content-Type","application/json")
+				.when().post("/1/boards/").then().statusCode(200).extract().response();
+		
+		
+		System.out.println(Re.asString());
+		
+		JsonPath x=new JsonPath(Re.asString());
+		id = x.getString("id");
+		System.out.println(id);
+
+	}
+	@Test(priority = 1)
+	public void get_Board() {
+		RestAssured.baseURI="https://api.trello.com";
+		 given()
+				.queryParam("key", key).queryParam("token", token).header("Content-Type","application/json")
+				.when().get(id).then().statusCode(200);
+	}
+	
+	@Test(priority = 2)
+	public void update() {
+		RestAssured.baseURI="https://api.trello.com";
+		 given().queryParam("name", "anu")
+				.queryParam("key", key).queryParam("token", token).header("Content-Type","application/json").when()
+				.put("/1/boards/"+id).then().statusCode(200);
+		
+	}
+	
+	@Test(priority = 3)
+	public void Delete() {
+		RestAssured.baseURI="https://api.trello.com/1/boards/"+id;
+		 given().queryParam("key", key).queryParam("token", token).header("Content-Type","application/json")
+				.when()
+				.delete().then()
+				.statusCode(200);
+				
+	}
+	
+}
